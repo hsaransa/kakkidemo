@@ -26,10 +26,10 @@ static struct PlotPixels pixels;
 static RayTracer rt;
 static Camera camera;
 
-static float demoLength = 2 * 60.f + 1.f;
-static Music music("musa.ogg", 140.0);
+static float demoLength = 2 * 60.f + 15.f;
+static Music music("assets/musa.ogg", 130.0);
 
-static Image testImg("test.png");
+static Image testImg("assets/title.png");
 
 //
 // Job.
