@@ -203,6 +203,10 @@ int main(int argc, char* argv[])
     camera.targetCamera = false;
     camera.translateLocal(Vector3f(0.f, -1.f, 0.f));
 
+    CameraPath jeejee;
+    jeejee.load("camera.txt");
+    camera.view = jeejee.frames[0];
+
     sem = SDL_CreateSemaphore(0);
     mutex = SDL_CreateMutex();
 
@@ -217,8 +221,9 @@ int main(int argc, char* argv[])
 
     int lastRecordTime = 0;
     bool recordMode = false;
-    bool playMode = false;
+    bool playMode = true;
     CameraPath recordPath;
+    recordPath.load("camera.txt");
 
     for (;;)
     {
@@ -253,7 +258,7 @@ int main(int argc, char* argv[])
 
         if (playMode)
         {
-            camera.view = recordPath.get(SDL_GetTicks() / 1000.f);
+            camera.view = recordPath.get(SDL_GetTicks() / 1000.f * 5.f);
         }
 
         if (recordMode)
@@ -308,7 +313,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        demoTime += dt;
+        demoTime = music.getTime();
 
         render();
         SDL_GL_SwapBuffers();
