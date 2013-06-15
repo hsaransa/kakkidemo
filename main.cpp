@@ -25,6 +25,7 @@ static struct PlotPixels pixels;
 static RayTracer rt;
 static Camera camera;
 
+static float demoLength = 3 * 60.f + 36.f;
 static Music music("musa.ogg", 140.0);
 
 static Image testImg("test.png");
@@ -161,7 +162,8 @@ static void render()
 
     raytrace(screen, camera);
 
-    wobbler(screen2, screen, demoTime * 30.f, demoTime* 23.4f);
+    float strength = demoTime / demoLength * 10.f;
+    wobbler(screen2, screen, demoTime * 30.f, demoTime* 23.4f, strength);
 
     putImageFullScreen(screen2);
 }
