@@ -17,6 +17,7 @@ static SDL_mutex* mutex;
 static Image screen;
 static float demoTime;
 static struct PlotPixels pixels;
+static RayTracer rt;
 
 //
 // Job.
@@ -34,6 +35,7 @@ struct Job
     int x, y, w, h;
     Image* img;
     const Camera* cam;
+    RayTracer* rt;
     PlotPixels* plotPixels;
 };
 
@@ -83,6 +85,7 @@ void raytrace(Image& dst, const Camera& cam)
         j.h = y1 - y0;
         j.img = &dst;
         j.cam = &cam;
+        j.rt = &rt;
         putJob(j);
     }
 
@@ -102,7 +105,7 @@ static int thread_func(void* id)
         SDL_mutexV(mutex);
 
         if (j.type == RAY_TRACE)
-            raytraceSub(*j.img, *j.cam, j.x, j.y, j.w, j.h);
+            raytraceSub(*j.rt, j.x, j.y, j.w, j.h);
         else if (j.type == PLOT_PIXEL)
             plotPixels(*j.img, *j.cam, *j.plotPixels);
         else
@@ -116,8 +119,10 @@ static int thread_func(void* id)
 
 static void render()
 {
+#if 0
     glClearColor(0.2f, 0.4f, 0.5f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT);
+#endif
 
 #if 0
     for (int y = 0; y < screen.h; y++)
@@ -132,6 +137,13 @@ static void render()
     camera.fov = 3.14159265f*2.f * 90.f / 360.f;
     camera.update();
 
+    if (!rt.camera)
+    {
+        rt.image = &screen;
+        rt.camera = &camera;
+        rt.update();
+    }
+
     raytrace(screen, camera);
 
     putImageFullScreen(screen);
@@ -143,7 +155,7 @@ int main(int argc, char* argv[])
     SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
     pixels.create(256);
-    generateSphere(pixels, Vector3f(0.f, 0.f, 0.f), 4.f, 128);
+    generateSphere(pixels, Vector3f(0.f, 3.f, 0.f), 5.f, 128);
 
     screen.resize(256, 256);
 
