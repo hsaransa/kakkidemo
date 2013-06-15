@@ -24,6 +24,16 @@ namespace kd
         Vector4f* pixelColor;
     };
 
+    static Vector4f blendPixel(const Vector4f& src, const Vector4f& dst)
+    {
+        const float r = src.x * src.w + dst.x;
+        const float g = src.y * src.w + dst.y;
+        const float b = src.z * src.w + dst.z;
+        const float a = dst.w;
+
+        return Vector4f(r, g, b, a);
+    }
+
     static void plotPixels(Image& dst, const Camera& cam, const PlotPixels& pp)
     {
         for (int i = 0; i < pp.numPixels; i++)
@@ -41,10 +51,10 @@ namespace kd
             if (x < 1 || y < 1 || x >= dst.w || y >= dst.h)
                 continue;
 
-            dst.put(x-1, y-1, pp.pixelColor[i]);
-            dst.put(x, y-1, pp.pixelColor[i]);
-            dst.put(x-1, y, pp.pixelColor[i]);
-            dst.put(x, y, pp.pixelColor[i]);
+            dst.put(x-1, y-1,   blendPixel(pp.pixelColor[i], dst.get(x-1, y-1)));
+            dst.put(x, y-1,     blendPixel(pp.pixelColor[i], dst.get(x, y-1)));
+            dst.put(x-1, y,     blendPixel(pp.pixelColor[i], dst.get(x-1, y)));
+            dst.put(x, y,       blendPixel(pp.pixelColor[i], dst.get(x, y)));
         }
     }
 
