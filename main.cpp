@@ -5,16 +5,18 @@
 #include "image.hpp"
 #include "camera.hpp"
 #include "raytracer.hpp"
+#include "plotpixels.hpp"
 
 using namespace kd;
 
 static int num_threads   = 2;
-static int screen_width  = 700;
-static int screen_height = 700;
+static int screen_width  = 600;
+static int screen_height = 600;
 static SDL_sem* sem;
 static SDL_mutex* mutex;
 static Image screen;
 static float demoTime;
+static struct PlotPixels pixels;
 
 //
 // Job.
@@ -22,7 +24,8 @@ static float demoTime;
 
 enum JobType
 {
-    RAY_TRACE
+    RAY_TRACE,
+    PLOT_PIXEL
 };
 
 struct Job
@@ -31,6 +34,7 @@ struct Job
     int x, y, w, h;
     Image* img;
     const Camera* cam;
+    PlotPixels* plotPixels;
 };
 
 static Job jobs[128];
@@ -84,6 +88,8 @@ void raytrace(Image& dst, const Camera& cam)
 
     while (!allJobsDone())
         SDL_Delay(1);
+
+    plotPixels(dst, cam, pixels);
 }
 
 static int thread_func(void* id)
@@ -95,8 +101,10 @@ static int thread_func(void* id)
         Job j = jobs[--numJobs];
         SDL_mutexV(mutex);
 
-        if (j.type == 0)
+        if (j.type == RAY_TRACE)
             raytraceSub(*j.img, *j.cam, j.x, j.y, j.w, j.h);
+        else if (j.type == PLOT_PIXEL)
+            plotPixels(*j.img, *j.cam, *j.plotPixels);
         else
             assert(0);
 
@@ -122,7 +130,6 @@ static void render()
     camera.position.y = sinf(demoTime*3.14159265f*2.f * 0.2f) * 3.f + 10.f;
     camera.position.z = sinf(demoTime*3.14159265f*2.f * 0.1f) * 10.f;
     camera.fov = 3.14159265f*2.f * 90.f / 360.f;
-
     camera.update();
 
     raytrace(screen, camera);
@@ -134,6 +141,9 @@ int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
+
+    pixels.create(256);
+    generateSphere(pixels, Vector3f(0.f, 0.f, 0.f), 4.f, 128);
 
     screen.resize(256, 256);
 
