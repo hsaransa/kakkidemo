@@ -6,7 +6,7 @@ namespace kd
 {
     struct RayTracer
     {
-        RayTracer() : image(0), camera(0), invRayLen(0) {}
+        RayTracer() : image(0), invRayLen(0) {}
 
         void update()
         {
@@ -23,13 +23,13 @@ namespace kd
                     float fx = (x + .5f) / float(image->w) * 2.f - 1.f;
 
                     Vector4f e = Vector4f(fx, fy,  1.f, 1.f);
-                    Vector4f e2 = camera->clipToView * e;
+                    Vector4f e2 = camera.clipToView * e;
 
                     invW[y*w+x] = 1.f / e2.w;
 
                     e2 /= e2.w;
 
-                    Vector3f o = camera->position;
+                    Vector3f o = camera.position;
                     Vector3f d = e2.xyz() - o;
 
                     float len = d.length();
@@ -39,7 +39,7 @@ namespace kd
         }
 
         Image* image;
-        const Camera* camera;
+        Camera camera;
         float* invW;
         float* invRayLen;
     };
@@ -50,7 +50,7 @@ namespace kd
         float fx = (x + .5f) / float(rt.image->w) * 2.f - 1.f;
 
         Vector4f e = Vector4f(fx, fy,  1.f, 1.f);
-        Vector4f e2 = rt.camera->clipToView * e;
+        Vector4f e2 = rt.camera.clipToView * e;
 
         int p = y * rt.image->w + x;
 
@@ -58,7 +58,7 @@ namespace kd
         e2.y *= rt.invW[p];
         e2.z *= rt.invW[p];
 
-        o = rt.camera->position;
+        o = rt.camera.position;
         d = e2.xyz() - o;
 
         d.x *= rt.invRayLen[p];

@@ -43,8 +43,8 @@ struct Job
 };
 
 static Job jobs[128];
-static int numJobs;
-static int jobsLeft;
+static volatile int numJobs;
+static volatile int jobsLeft;
 
 static void putJob(Job& j)
 {
@@ -75,10 +75,11 @@ static void putImageFullScreen(const Image& img)
 
 void raytrace(Image& dst, const Camera& cam)
 {
-    for (int i = 0; i < 16; i++)
+#if 0
+    for (int i = 0; i < 7; i++)
     {
-        int y0 = dst.h * i / 16;
-        int y1 = dst.h * (i+1) / 16;
+        int y0 = dst.h * i / 7;
+        int y1 = dst.h * (i+1) / 7;
 
         Job j;
         j.type = RAY_TRACE;
@@ -94,6 +95,9 @@ void raytrace(Image& dst, const Camera& cam)
 
     while (!allJobsDone())
         SDL_Delay(1);
+#endif
+
+    raytraceSub(rt, 0, 0, dst.w, dst.h);
 
     plotPixels(dst, cam, pixels);
 }
@@ -140,10 +144,11 @@ static void render()
     camera.fov = 3.14159265f*2.f * 90.f / 360.f;
     camera.update();
 
-    if (!rt.camera)
+    rt.camera = camera;
+
+    if (!rt.image)
     {
         rt.image = &screen;
-        rt.camera = &camera;
         rt.update();
     }
 
