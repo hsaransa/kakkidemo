@@ -4,6 +4,7 @@
 #include "math.hpp"
 #include "image.hpp"
 #include "camera.hpp"
+#include "raytracer.hpp"
 
 using namespace kd;
 

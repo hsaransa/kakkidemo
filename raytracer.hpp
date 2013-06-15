@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math.hpp"
+
 namespace kd
 {
     struct RayTracePrecalc
@@ -13,7 +15,7 @@ namespace kd
         return o.y / -d.y;
     }
 
-    static void getRayForPixel(const Image& img, const Camera& cam, int x, int y, Vector3& o, Vector3& d)
+    static void getRayForPixel(const Image& img, const Camera& cam, int x, int y, Vector3f& o, Vector3f& d)
     {
         float fy = (y + .5f) / float(img.h) * 2.f - 1.f;
         float fx = (x + .5f) / float(img.w) * 2.f - 1.f;
@@ -36,13 +38,14 @@ namespace kd
         for (int y = sy; y < sy+sh; y++)
             for (int x = sx; x < sx+sw; x++)
             {
-                getRayForPixel(x, y, o, d);
+                Vector3f o, d;
+                getRayForPixel(dst, cam, x, y, o, d);
 
-                float t = intersectPlane(img, cam, o, dir);
+                float t = intersectPlane(o, d);
 
                 if (t > 0.f)
                 {
-                    Vector3f p = o + dir * t;
+                    Vector3f p = o + d * t;
 
                     int xx = int(p.x * 5.f);
                     int yy = int(p.z * 5.f);
@@ -57,7 +60,9 @@ namespace kd
                     dst.put(x, y, c);
                 }
                 else
-                    dst.put(x, y, Vector4f(dir, 1.f));
+                {
+                    dst.put(x, y, Vector4f(0.1f, 0.2f, 0.8f, 1.f));
+                }
             }
     }
 }
