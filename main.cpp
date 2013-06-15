@@ -185,7 +185,7 @@ static void render()
 int main(int argc, char* argv[])
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
+    SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL | SDL_FULLSCREEN);
 
     IMG_Init(IMG_INIT_PNG);
 

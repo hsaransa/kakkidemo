@@ -1,4 +1,11 @@
-kakkidemo
+PastPart2
 =========
 
-CAG demo
+A demo
+
+by
+
+Kaveri
+
+code  :: Hipo & Lorkki
+audio :: Lorkki
