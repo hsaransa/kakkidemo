@@ -60,4 +60,18 @@ namespace kd
             pp.numPixels++;
         }
     }
+
+    static void plotImage(PlotPixels& pp, const Vector3f& p, Image& img, float sx, float sy)
+    {
+        for (int y = 0; y < img.h; y++)
+            for (int x = 0; x < img.w; x++)
+            {
+                const float fx = sx * float(x) / float(img.w);
+                const float fy = sy * float(y) / float(img.h);
+
+                pp.pixelPos[pp.numPixels] = p + Vector3f(fx, fy, 0.f);
+                pp.pixelColor[pp.numPixels] = img.get(x, y);
+                pp.numPixels++;
+            }
+    }
 }

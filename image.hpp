@@ -2,6 +2,9 @@
 
 #include "defs.hpp"
 #include <stdlib.h>
+#include <string>
+
+#include "SDL_image.h"
 
 namespace kd
 {
@@ -10,6 +13,22 @@ namespace kd
     public:
         Image() : w(0), h(0), data(0) {}
         ~Image() { destroy(); }
+
+        Image(std::string filename)
+        {
+            SDL_Surface* surface = IMG_Load(filename.c_str());
+
+            resize(surface->w, surface->h);
+
+            for (int y = 0; y < surface->h; y++)
+            {
+                memcpy(static_cast<uint32*>(data) + y*w,
+                        static_cast<uint8*>(surface->pixels) + y*surface->pitch,
+                        w*4);
+            }
+
+            SDL_FreeSurface(surface);
+        }
 
         void destroy()
         {
@@ -39,6 +58,23 @@ namespace kd
             int a = std::max(0, std::min(255, int(c.w * 256.f)));
 
             data[y*w+x] = r | (g<<8) | (b<<16) | (a<<24);
+        }
+
+        float toF(const uint8& comp)
+        {
+            return float(comp) / float(255);
+        }
+
+        Vector4f get(int x, int y)
+        {
+            const uint32& pixel = data[y*w+x];
+
+            const uint8 r = pixel & 0xff;
+            const uint8 g = (pixel>> 8) & 0xff;
+            const uint8 b = (pixel>>16) & 0xff;
+            const uint8 a = (pixel>>24) & 0xff;
+
+            return Vector4f(toF(r), toF(g), toF(b), toF(a));
         }
 
         int w, h;

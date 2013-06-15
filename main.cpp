@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 #include "SDL_thread.h"
+#include "SDL_image.h"
 #include "math.hpp"
 #include "image.hpp"
 #include "camera.hpp"
@@ -19,6 +20,8 @@ static float demoTime;
 static struct PlotPixels pixels;
 static RayTracer rt;
 
+static Image testImg("test.png");
+
 //
 // Job.
 //
@@ -26,7 +29,7 @@ static RayTracer rt;
 enum JobType
 {
     RAY_TRACE,
-    PLOT_PIXEL
+    PLOT_PIXEL,
 };
 
 struct Job
@@ -154,8 +157,13 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO);
     SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
-    pixels.create(256);
-    generateSphere(pixels, Vector3f(0.f, 3.f, 0.f), 5.f, 128);
+    IMG_Init(IMG_INIT_PNG);
+
+    //pixels.create(256);
+    //generateSphere(pixels, Vector3f(0.f, 0.f, 0.f), 4.f, 128);
+
+    pixels.create(testImg.w * testImg.h);
+    plotImage(pixels, Vector3f(-2.f, -4.f, 0.f), testImg, 4.f, 4.f);
 
     screen.resize(256, 256);
 
@@ -186,5 +194,7 @@ int main(int argc, char* argv[])
         render();
         SDL_GL_SwapBuffers();
     }
+
+    IMG_Quit();
 }
 
