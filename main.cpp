@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
 
         if (playMode)
         {
-            camera.view = recordPath.get(SDL_GetTicks() / 1000.f * 5.f);
+            camera.view = recordPath.get(SDL_GetTicks() / 1000.f * 3.f);
         }
 
         if (recordMode)
@@ -317,6 +317,9 @@ int main(int argc, char* argv[])
 
         render();
         SDL_GL_SwapBuffers();
+
+        if (demoTime >= demoLength)
+            break;
     }
 
     IMG_Quit();
