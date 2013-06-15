@@ -9,6 +9,7 @@
 #include "plotpixels.hpp"
 #include "camerapath.hpp"
 #include "music.hpp"
+#include "wobbler.hpp"
 
 using namespace kd;
 
@@ -18,6 +19,7 @@ static int screen_height = 600;
 static SDL_sem* sem;
 static SDL_mutex* mutex;
 static Image screen;
+static Image screen2;
 static float demoTime;
 static struct PlotPixels pixels;
 static RayTracer rt;
@@ -159,7 +161,9 @@ static void render()
 
     raytrace(screen, camera);
 
-    putImageFullScreen(screen);
+    wobbler(screen2, screen, demoTime * 30.f, demoTime* 23.4f);
+
+    putImageFullScreen(screen2);
 }
 
 int main(int argc, char* argv[])
@@ -178,6 +182,7 @@ int main(int argc, char* argv[])
     plotImage(pixels, Vector3f(-2.f, -4.f, 0.f), testImg, 4.f, 4.f);
 
     screen.resize(256, 256);
+    screen2.resize(256, 256);
 
     camera.targetCamera = false;
     camera.translateLocal(Vector3f(0.f, -1.f, 0.f));
