@@ -77,8 +77,10 @@ namespace kd
 
         det = sqrtf(det);
 
-        t1 = (-d.x * o.x - d.z * o.z - det) / l;
-        t2 = (-d.x * o.x - d.z * o.z + det) / l;
+        l = 1.f / l;
+
+        t1 = (-d.x * o.x - d.z * o.z - det) * l;
+        t2 = (-d.x * o.x - d.z * o.z + det) * l;
         return true;
     }
 

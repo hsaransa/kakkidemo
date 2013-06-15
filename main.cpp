@@ -19,6 +19,7 @@ static Image screen;
 static float demoTime;
 static struct PlotPixels pixels;
 static RayTracer rt;
+static Camera camera;
 
 static Image testImg("test.png");
 
@@ -137,7 +138,6 @@ static void render()
             screen.data[y*screen.w+x] = x*256+y*3;
 #endif
 
-    Camera camera;
     camera.position.x = cosf(demoTime*3.14159265f*2.f * 0.1f) * 10.f;
     camera.position.y = sinf(demoTime*3.14159265f*2.f * 0.2f) * 3.f + 10.f;
     camera.position.z = sinf(demoTime*3.14159265f*2.f * 0.1f) * 10.f;
@@ -172,6 +172,8 @@ int main(int argc, char* argv[])
 
     screen.resize(256, 256);
 
+    camera.targetCamera = true;
+
     sem = SDL_CreateSemaphore(0);
     mutex = SDL_CreateMutex();
 
@@ -179,10 +181,41 @@ int main(int argc, char* argv[])
     for (int i = 0; i < num_threads; i++)
         th[i] = SDL_CreateThread(thread_func, (void*)i);
 
+    int ticks = SDL_GetTicks();
+    int mouseX, mouseY;
+
     for (;;)
     {
-        SDL_Event ev;
+        int deltaTicks = SDL_GetTicks() - ticks;
+        ticks += deltaTicks;
+        float dt = deltaTicks / 1000.f;
 
+        Uint8 *keys = SDL_GetKeyState(NULL);
+        if (keys[SDLK_ESCAPE])
+            break;
+
+        static float scale = 10.5f;
+
+        if (SDL_GetKeyState(0)[SDLK_KP_PLUS])
+        {
+            scale *= expf(dt);
+            printf("speed %f\n", scale);
+        }
+        if (SDL_GetKeyState(0)[SDLK_KP_MINUS])
+        {
+            scale /= expf(dt);
+            printf("speed %f\n", scale);
+        }
+        if (SDL_GetKeyState(0)[SDLK_w])
+            camera.translateLocal(Vector3f(0.f, 0.f, scale) * dt);
+        if (SDL_GetKeyState(0)[SDLK_s])
+            camera.translateLocal(Vector3f(0.f, 0.f, -scale) * dt);
+        if (SDL_GetKeyState(0)[SDLK_a])
+            camera.translateLocal(Vector3f(scale, 0.f, 0.f) * dt);
+        if (SDL_GetKeyState(0)[SDLK_d])
+            camera.translateLocal(Vector3f(-scale, 0.f, 0.f) * dt);
+
+        SDL_Event ev;
         SDL_PollEvent(&ev);
 
         if (ev.type == SDL_QUIT)
@@ -192,6 +225,18 @@ int main(int argc, char* argv[])
         {
             if (ev.key.keysym.sym == SDLK_ESCAPE)
                 break;
+        }
+
+        if (ev.type == SDL_MOUSEMOTION && (ev.motion.state & SDL_BUTTON(1)))
+        {
+            float dx = (ev.motion.x - mouseX) / float(screen_width) * 3.14159265f * 3.3f;
+            float dy = (ev.motion.y - mouseY) / float(screen_height) * 3.14159265f * 3.3f;
+
+            camera.rotateLocal(Vector3f(0.f, 1.f, 0.f), dx);
+            camera.rotateLocal(Vector3f(1.f, 0.f, 0.f), dy);
+
+            mouseX = ev.motion.x;
+            mouseY = ev.motion.y;
         }
 
         demoTime = SDL_GetTicks() / 1000.f;
