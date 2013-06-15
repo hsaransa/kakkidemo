@@ -8,6 +8,7 @@
 #include "raytracer.hpp"
 #include "plotpixels.hpp"
 #include "camerapath.hpp"
+#include "music.hpp"
 
 using namespace kd;
 
@@ -21,6 +22,8 @@ static float demoTime;
 static struct PlotPixels pixels;
 static RayTracer rt;
 static Camera camera;
+
+static Music music("musa.ogg", 140.0);
 
 static Image testImg("test.png");
 
@@ -161,10 +164,12 @@ static void render()
 
 int main(int argc, char* argv[])
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     SDL_SetVideoMode(screen_width, screen_height, 0, SDL_OPENGL);
 
     IMG_Init(IMG_INIT_PNG);
+
+    music.init();
 
     //pixels.create(256);
     //generateSphere(pixels, Vector3f(0.f, 0.f, 0.f), 4.f, 128);
@@ -179,6 +184,8 @@ int main(int argc, char* argv[])
 
     sem = SDL_CreateSemaphore(0);
     mutex = SDL_CreateMutex();
+
+    music.play();
 
     SDL_Thread* th[num_threads];
     for (int i = 0; i < num_threads; i++)

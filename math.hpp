@@ -1245,4 +1245,6 @@ namespace kd
 
     static inline int prevMod3(int x) { return (0x12 >> (2*x)) & ~3; }
     static inline int nextMod3(int x) { return (0x09 >> (2*x)) & ~3; }
+
+    static inline int absi(int x) { return x < 0 ? -x : x; }
 }
