@@ -10,6 +10,7 @@
 #include "camerapath.hpp"
 #include "music.hpp"
 #include "wobbler.hpp"
+#include "blur.hpp"
 
 using namespace kd;
 
@@ -25,7 +26,7 @@ static struct PlotPixels pixels;
 static RayTracer rt;
 static Camera camera;
 
-static float demoLength = 3 * 60.f + 36.f;
+static float demoLength = 2 * 60.f + 1.f;
 static Music music("musa.ogg", 140.0);
 
 static Image testImg("test.png");
@@ -165,7 +166,20 @@ static void render()
     float strength = demoTime / demoLength * 10.f;
     wobbler(screen2, screen, demoTime * 30.f, demoTime* 23.4f, strength);
 
-    putImageFullScreen(screen2);
+    blurh(screen, screen2);
+
+    if (demoTime > 10.f)
+    {
+        for (int i = 0; i< 4; i++)
+        {
+            blurh(screen2, screen);
+            blurh(screen, screen2);
+            blurv(screen2, screen);
+            blurv(screen, screen2);
+        }
+    }
+
+    putImageFullScreen(screen);
 }
 
 int main(int argc, char* argv[])
