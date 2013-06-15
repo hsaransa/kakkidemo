@@ -101,14 +101,12 @@ namespace kd
 
                 float tc1, tc2;
 
-                if (intersectCylinder(o, d, tc1, tc2))
+                if (intersectCylinder(o, d, tc1, tc2) && tc2 > 0.f)
                 {
                     if (tp > 0.f && tp < tc1)
                         goto plop;
 
-                    float t;
-                    if (tp > tc1 && tp < tc2)
-                        t = tc2;
+                    float t = tc2;
 
                     Vector3f p = o + d * t;
 

@@ -18,6 +18,8 @@ namespace kd
         {
             SDL_Surface* surface = IMG_Load(filename.c_str());
 
+            kd_assert(surface);
+
             resize(surface->w, surface->h);
 
             for (int y = 0; y < surface->h; y++)
